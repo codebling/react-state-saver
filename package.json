@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "peerDependencies": {
+    "react": "*"
+  }
 }
