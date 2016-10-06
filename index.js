@@ -7,7 +7,6 @@ function hook() {
   if(originalCreateClassFunction === null) {
     originalCreateClassFunction = React.createClass;
     React.createClass = function(spec) {
-      console.log('bla');
       var originalGetInitialStateFunction = spec.getInitialState;
       spec.getInitialState = function() {
         return originalGetInitialStateFunction.apply(this, arguments);
