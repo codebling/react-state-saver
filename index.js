@@ -1,9 +1,12 @@
 "use strict";
 var React = require('react');
+var Map = require("collections/map");
 
 var originalCreateClassFunction = null;
 
-var StateSaver = function() {};
+var StateSaver = function() {
+  this.map = new Map();
+};
 StateSaver.prototype.hook = function() {
   if(originalCreateClassFunction === null) {
     originalCreateClassFunction = React.createClass;
@@ -11,7 +14,9 @@ StateSaver.prototype.hook = function() {
     React.createClass = function(spec) {
       var originalGetInitialStateFunction = spec.getInitialState;
       spec.getInitialState = function() {
-        return originalGetInitialStateFunction.apply(this, arguments);
+        var state = originalGetInitialStateFunction.apply(this, arguments);
+        stateSaverThis.map.set({spec: spec, props: this.props}, state);
+        return state;
       };
       return originalCreateClassFunction.apply(React, arguments);
     };
@@ -22,6 +27,7 @@ StateSaver.prototype.unhook = function() {
     React.createClass = originalCreateClassFunction;
     originalCreateClassFunction = null;
   }
+  return this.map;
 };
 
 module.exports = function() {
