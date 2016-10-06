@@ -1,6 +1,6 @@
 "use strict";
 var React = require('react');
-var Map = require("collections/map");
+var Map = require('collections/map');
 var hash = require('object-hash');
 
 var originalCreateClassFunction = null;
