@@ -3,9 +3,12 @@ var React = require('react');
 
 var originalCreateClassFunction = null;
 
-function hook() {
+var StateSaver = function() {};
+StateSaver.prototype.hook =
+function() {
   if(originalCreateClassFunction === null) {
     originalCreateClassFunction = React.createClass;
+    var stateSaverThis = this;
     React.createClass = function(spec) {
       var originalGetInitialStateFunction = spec.getInitialState;
       spec.getInitialState = function() {
@@ -14,14 +17,15 @@ function hook() {
       return originalCreateClassFunction.apply(React, arguments);
     };
   }
-}
-
-function unhook() {
+};
+StateSaver.prototype.unhook =
+function() {
   if(originalCreateClassFunction !== null) {
     React.createClass = originalCreateClassFunction;
     originalCreateClassFunction = null;
   }
-}
+};
 
-module.exports.hook = hook;
-module.exports.unhook = unhook;
+module.exports = function() {
+  return new StateSaver();
+};
