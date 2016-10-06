@@ -4,8 +4,7 @@ var React = require('react');
 var originalCreateClassFunction = null;
 
 var StateSaver = function() {};
-StateSaver.prototype.hook =
-function() {
+StateSaver.prototype.hook = function() {
   if(originalCreateClassFunction === null) {
     originalCreateClassFunction = React.createClass;
     var stateSaverThis = this;
@@ -18,8 +17,7 @@ function() {
     };
   }
 };
-StateSaver.prototype.unhook =
-function() {
+StateSaver.prototype.unhook = function() {
   if(originalCreateClassFunction !== null) {
     React.createClass = originalCreateClassFunction;
     originalCreateClassFunction = null;
