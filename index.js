@@ -25,6 +25,19 @@ StateSaver.prototype.installCaptureHook = function() {
     };
   }
 };
+StateSaver.prototype.installReplayHook = function() {
+  if(originalCreateClassFunction === null) {
+    originalCreateClassFunction = React.createClass;
+    var stateSaverThis = this;
+    React.createClass = function(spec) {
+      var originalGetInitialStateFunction = spec.getInitialState;
+      spec.getInitialState = function() {
+        return stateSaverThis.map.get({spec: spec, specHash: hash(spec), props: this.props});
+      };
+      return originalCreateClassFunction.apply(React, arguments);
+    };
+  }
+};
 StateSaver.prototype.uninstallCaptureHook = function() {
   if(originalCreateClassFunction !== null) {
     React.createClass = originalCreateClassFunction;
