@@ -15,7 +15,7 @@ StateSaver.prototype.installCaptureHook = function() {
       var originalGetInitialStateFunction = spec.getInitialState;
       spec.getInitialState = function() {
         var state = originalGetInitialStateFunction.apply(this, arguments);
-        stateSaver.map.set({spec: spec, specHash: hash(spec), props: this.props}, state);
+        stateSaver.map.set({specHash: hash(spec), propsHash: hash(this.props)}, state);
         return state;
       };
       return originalCreateClassFunction.apply(React, arguments);
