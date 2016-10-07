@@ -10,7 +10,7 @@ var StateSaver = function(serializedData) {
   var data = eval(serializedData);
   this.map = new Map(data);
 };
-StateSaver.prototype.hook = function() {
+StateSaver.prototype.startCapture = function() {
   if(originalCreateClassFunction === null) {
     originalCreateClassFunction = React.createClass;
     var stateSaverThis = this;
@@ -25,7 +25,7 @@ StateSaver.prototype.hook = function() {
     };
   }
 };
-StateSaver.prototype.unhook = function() {
+StateSaver.prototype.stopCapture = function() {
   if(originalCreateClassFunction !== null) {
     React.createClass = originalCreateClassFunction;
     originalCreateClassFunction = null;
