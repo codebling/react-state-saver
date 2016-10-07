@@ -10,12 +10,12 @@ var StateSaver = function(data) {
 StateSaver.prototype.installCaptureHook = function() {
   if(originalCreateClassFunction === null) {
     originalCreateClassFunction = React.createClass;
-    var stateSaverThis = this;
+    var stateSaver = this;
     React.createClass = function(spec) {
       var originalGetInitialStateFunction = spec.getInitialState;
       spec.getInitialState = function() {
         var state = originalGetInitialStateFunction.apply(this, arguments);
-        stateSaverThis.map.set({spec: spec, specHash: hash(spec), props: this.props}, state);
+        stateSaver.map.set({spec: spec, specHash: hash(spec), props: this.props}, state);
         return state;
       };
       return originalCreateClassFunction.apply(React, arguments);
@@ -42,7 +42,7 @@ StateSaver.prototype.uninstallCaptureHook = function() {
   }
 };
 StateSaver.prototype.getSavedState = function() {
-    return this.map.entries();
+  return Array.from(this.map.entries());
 };
 
 module.exports = StateSaver;
