@@ -2,11 +2,13 @@
 var React = require('react');
 var Map = require('collections/map');
 var hash = require('object-hash');
+var serialize = require('serialize-javascript');
 
 var originalCreateClassFunction = null;
 
-var StateSaver = function() {
-  this.map = new Map();
+var StateSaver = function(serializedData) {
+  var data = eval(serializedData);
+  this.map = new Map(data);
 };
 StateSaver.prototype.hook = function() {
   if(originalCreateClassFunction === null) {
@@ -28,9 +30,9 @@ StateSaver.prototype.unhook = function() {
     React.createClass = originalCreateClassFunction;
     originalCreateClassFunction = null;
   }
-  return this.map;
+};
+StateSaver.prototype.getSavedState = function() {
+    return serialize(this.map.entries());
 };
 
-module.exports = function() {
-  return new StateSaver();
-};
+module.exports = StateSaver;
