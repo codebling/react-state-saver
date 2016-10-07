@@ -2,12 +2,10 @@
 var React = require('react');
 var Map = require('collections/map');
 var hash = require('object-hash');
-var serialize = require('serialize-javascript');
 
 var originalCreateClassFunction = null;
 
-var StateSaver = function(serializedData) {
-  var data = eval(serializedData);
+var StateSaver = function(data) {
   this.map = new Map(data);
 };
 StateSaver.prototype.installCaptureHook = function() {
@@ -45,7 +43,7 @@ StateSaver.prototype.uninstallCaptureHook = function() {
   }
 };
 StateSaver.prototype.getSavedState = function() {
-    return serialize(this.map.entries());
+    return this.map.entries();
 };
 
 module.exports = StateSaver;
