@@ -8,7 +8,6 @@
     "react": "*"
   },
   "dependencies": {
-    "collections": "2.0.2",
     "object-hash": "^1.1.4"
   }
 }
