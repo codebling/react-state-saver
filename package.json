@@ -9,5 +9,8 @@
   },
   "dependencies": {
     "object-hash": "^1.1.4"
+  },
+  "browser": {
+    "module": false
   }
 }
