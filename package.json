@@ -12,5 +12,8 @@
   },
   "browser": {
     "module": false
+  },
+  "devDependencies": {
+    "react": "^15.3.2"
   }
 }
