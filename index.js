@@ -47,7 +47,12 @@ StateSaver.prototype.installReplayHook = function() {
     React.createClass = function(spec) {
       var originalGetInitialStateFunction = spec.getInitialState;
       spec.getInitialState = function() {
-        return stateSaver.map.get({specHash: hash(spec), propsHash: hash(this.props)});
+        var savedState = stateSaver.map.get({specHash: hash(spec), propsHash: hash(this.props)});
+        if(typeof savedState === 'undefined') {
+          return originalGetInitialStateFunction.apply(arguments);
+        } else {
+          return savedState;
+        }
       };
       return originalCreateClassFunction.apply(React, arguments);
     };
