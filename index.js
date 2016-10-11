@@ -9,6 +9,31 @@ var markedProperty = '__MARKED_FOR_REACT_STATE_SAVING__';
 var originalGetInitialStateFunctionSavingProperty = '__ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
 var hashOfPlainOldSpecProperty = '__HASH_OF_PLAIN_OLD_SPEC__';
 
+var HashingHelper = {};
+HashingHelper.functionNormalisingReplacer = function (value) {
+  if(typeof value === 'function') {
+    value = value.toString().replace(/[ \t\r\n]+/g, '');
+  }
+  return value;
+};
+HashingHelper.computeHashOfPlainOldSpec = function (spec) {
+  var options = {
+    algorithm: 'md5', //the fastest
+    respectFunctionNames: true, //we want that
+    respectFunctionProperties: false, //speed + avoid risk of different primitive protos in node vs browser
+    respectType: false, //works for our use case: we're only hashing plain objects
+    unorderedArrays: true, //speed optimisation which should work for our use case
+    unorderedSets: true, //speed optimisation which should work for our use case
+    replacer: HashingHelper.functionNormalisingReplacer
+  };
+  return hash(spec, options);
+};
+HashingHelper.createKey = function (specHash, props) {
+  var propsHash = hash(JSON.stringify(props));
+  var objectKey = {specHash: specHash, propsHash: propsHash};
+  return hash(objectKey);
+};
+
 var StateSaver = function(data) {
   this.map = new Map(data);
 };
@@ -19,13 +44,12 @@ StateSaver.prototype.installCaptureHook = function() {
     var getReplacementGetInitiailStateFunction = function(spec) {
       return function() {
         var state = spec[originalGetInitialStateFunctionSavingProperty].apply(this, arguments);
-        stateSaver.map.set({specHash: spec[hashOfPlainOldSpecProperty], propsHash: hash(this.props)}, state);
+        stateSaver.map.set(HashingHelper.createKey(spec[hashOfPlainOldSpecProperty], this.props), state);
         return state;
       }
     };
     React.createClass = function(spec) {
-      var hashOfPlainOldSpec = hash(spec);
-      spec[hashOfPlainOldSpecProperty] = hashOfPlainOldSpec;
+      spec[hashOfPlainOldSpecProperty] = HashingHelper.computeHashOfPlainOldSpec(spec);
       spec[originalGetInitialStateFunctionSavingProperty] = spec.getInitialState;
       spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
       var reactClass = originalCreateClassFunction.apply(React, arguments);
@@ -49,8 +73,9 @@ StateSaver.prototype.installReplayHook = function() {
     var stateSaver = this;
     React.createClass = function(spec) {
       var originalGetInitialStateFunction = spec.getInitialState;
+      spec[hashOfPlainOldSpecProperty] = HashingHelper.computeHashOfPlainOldSpec(spec);
       spec.getInitialState = function() {
-        var savedState = stateSaver.map.get({specHash: hash(spec), propsHash: hash(this.props)});
+        var savedState = stateSaver.map.get(HashingHelper.createKey(spec[hashOfPlainOldSpecProperty], this.props));
         if(typeof savedState === 'undefined') {
           return originalGetInitialStateFunction.apply(arguments);
         } else {
