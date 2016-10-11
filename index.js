@@ -7,6 +7,7 @@ var originalCreateClassFunction = null;
 var originalRequire = null;
 var markedProperty = '__MARKED_FOR_REACT_STATE_SAVING__';
 var originalGetInitialStateFunctionSavingProperty = '__ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
+var hashOfPlainOldSpecProperty = '__HASH_OF_PLAIN_OLD_SPEC__';
 
 var StateSaver = function(data) {
   this.map = new Map(data);
@@ -18,11 +19,13 @@ StateSaver.prototype.installCaptureHook = function() {
     var getReplacementGetInitiailStateFunction = function(spec) {
       return function() {
         var state = spec[originalGetInitialStateFunctionSavingProperty].apply(this, arguments);
-        stateSaver.map.set({specHash: hash(spec), propsHash: hash(this.props)}, state);
+        stateSaver.map.set({specHash: spec[hashOfPlainOldSpecProperty], propsHash: hash(this.props)}, state);
         return state;
       }
     };
     React.createClass = function(spec) {
+      var hashOfPlainOldSpec = hash(spec);
+      spec[hashOfPlainOldSpecProperty] = hashOfPlainOldSpec;
       spec[originalGetInitialStateFunctionSavingProperty] = spec.getInitialState;
       spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
       var reactClass = originalCreateClassFunction.apply(React, arguments);
