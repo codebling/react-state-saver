@@ -5,9 +5,9 @@ var hash = require('object-hash');
 
 var originalCreateClassFunction = null;
 var originalRequire = null;
-var markedProperty = '__MARKED_FOR_REACT_STATE_SAVING__';
-var originalGetInitialStateFunctionSavingProperty = '__ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
-var hashOfPlainOldSpecProperty = '__HASH_OF_PLAIN_OLD_SPEC__';
+var markedKey = '__MARKED_FOR_REACT_STATE_SAVING__';
+var originalGetInitialStateFunctionSaveKey = '__ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
+var hashOfPlainOldSpecKey = '__HASH_OF_PLAIN_OLD_SPEC__';
 
 var HashingHelper = {};
 HashingHelper.functionNormalisingReplacer = function (value) {
@@ -43,23 +43,23 @@ StateSaver.prototype.installCaptureHook = function() {
     var stateSaver = this;
     var getReplacementGetInitiailStateFunction = function(spec) {
       return function() {
-        var state = spec[originalGetInitialStateFunctionSavingProperty].apply(this, arguments);
-        stateSaver.map.set(HashingHelper.createKey(spec[hashOfPlainOldSpecProperty], this.props), state);
+        var state = spec[originalGetInitialStateFunctionSaveKey].apply(this, arguments);
+        stateSaver.map.set(HashingHelper.createKey(spec[hashOfPlainOldSpecKey], this.props), state);
         return state;
       }
     };
     React.createClass = function(spec) {
-      spec[hashOfPlainOldSpecProperty] = HashingHelper.computeHashOfPlainOldSpec(spec);
-      spec[originalGetInitialStateFunctionSavingProperty] = spec.getInitialState;
+      spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
+      spec[originalGetInitialStateFunctionSaveKey] = spec.getInitialState;
       spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
       var reactClass = originalCreateClassFunction.apply(React, arguments);
-      reactClass[markedProperty] = true;
+      reactClass[markedKey] = true;
       return reactClass;
     };
     originalRequire = Module.prototype.require;
     Module.prototype.require = function() {
       var potentialReactClass = originalRequire.apply(this, arguments);
-      if(potentialReactClass[markedProperty]) {
+      if(potentialReactClass[markedKey]) {
         var spec = potentialReactClass.prototype;
         spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
       }
@@ -73,9 +73,9 @@ StateSaver.prototype.installReplayHook = function() {
     var stateSaver = this;
     React.createClass = function(spec) {
       var originalGetInitialStateFunction = spec.getInitialState;
-      spec[hashOfPlainOldSpecProperty] = HashingHelper.computeHashOfPlainOldSpec(spec);
+      spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
       spec.getInitialState = function() {
-        var savedState = stateSaver.map.get(HashingHelper.createKey(spec[hashOfPlainOldSpecProperty], this.props));
+        var savedState = stateSaver.map.get(HashingHelper.createKey(spec[hashOfPlainOldSpecKey], this.props));
         if(typeof savedState === 'undefined') {
           return originalGetInitialStateFunction.apply(arguments);
         } else {
