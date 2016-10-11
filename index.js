@@ -80,16 +80,16 @@ StateSaver.prototype.installReplayHook = function() {
     React.createClass = function(spec) {
       var hasGetInitialStateFunction = getInitialStateKey in Object.keys(spec);
       if(hasGetInitialStateFunction) {
-      var originalGetInitialStateFunction = spec[getInitialStateKey];
-      spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
-      spec[getInitialStateKey] = function() {
-        var savedState = stateSaver.map.get(HashingHelper.createKey(spec[hashOfPlainOldSpecKey], this.props));
-        if(typeof savedState === 'undefined') {
-          return originalGetInitialStateFunction.apply(arguments);
-        } else {
-          return savedState;
-        }
-      };
+        var originalGetInitialStateFunction = spec[getInitialStateKey];
+        spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
+        spec[getInitialStateKey] = function() {
+          var savedState = stateSaver.map.get(HashingHelper.createKey(spec[hashOfPlainOldSpecKey], this.props));
+          if(typeof savedState === 'undefined') {
+            return originalGetInitialStateFunction.apply(arguments);
+          } else {
+            return savedState;
+          }
+        };
       }
       return originalCreateClassFunction.apply(React, arguments);
     };
