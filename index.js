@@ -5,9 +5,9 @@ var hash = require('object-hash');
 
 var originalCreateClassFunction = null;
 var originalRequire = null;
-var markedKey = '__MARKED_FOR_REACT_STATE_SAVING__';
-var originalGetInitialStateFunctionSaveKey = '__ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
-var hashOfPlainOldSpecKey = '__HASH_OF_PLAIN_OLD_SPEC__';
+var markedKey = '__REACT_STATE_SAVER_MARKED_FOR_REACT_STATE_SAVING__';
+var originalGetInitialStateFunctionSaveKey = '__REACT_STATE_SAVER_ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
+var hashOfPlainOldSpecKey = '__REACT_STATE_SAVER_HASH_OF_PLAIN_OLD_SPEC__';
 
 var HashingHelper = {};
 HashingHelper.functionNormalisingReplacer = function (value) {
