@@ -5,6 +5,7 @@ var hash = require('object-hash');
 
 var originalCreateClassFunction = null;
 var originalRequire = null;
+var getInitialStateKey = 'getInitialState';
 var markedKey = '__REACT_STATE_SAVER_MARKED_FOR_REACT_STATE_SAVING__';
 var originalGetInitialStateFunctionSaveKey = '__REACT_STATE_SAVER_ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
 var hashOfPlainOldSpecKey = '__REACT_STATE_SAVER_HASH_OF_PLAIN_OLD_SPEC__';
@@ -49,11 +50,16 @@ StateSaver.prototype.installCaptureHook = function() {
       }
     };
     React.createClass = function(spec) {
+      var hasGetInitialStateFunction = getInitialStateKey in Object.keys(spec);
+      if(hasGetInitialStateFunction) {
       spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
       spec[originalGetInitialStateFunctionSaveKey] = spec.getInitialState;
       spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
+      }
       var reactClass = originalCreateClassFunction.apply(React, arguments);
+      if(hasGetInitialStateFunction) {
       reactClass[markedKey] = true;
+      }
       return reactClass;
     };
     originalRequire = Module.prototype.require;
