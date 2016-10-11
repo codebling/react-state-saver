@@ -52,13 +52,13 @@ StateSaver.prototype.installCaptureHook = function() {
     React.createClass = function(spec) {
       var hasGetInitialStateFunction = getInitialStateKey in Object.keys(spec);
       if(hasGetInitialStateFunction) {
-      spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
-      spec[originalGetInitialStateFunctionSaveKey] = spec.getInitialState;
-      spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
+        spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
+        spec[originalGetInitialStateFunctionSaveKey] = spec.getInitialState;
+        spec.getInitialState = getReplacementGetInitiailStateFunction(spec);
       }
       var reactClass = originalCreateClassFunction.apply(React, arguments);
       if(hasGetInitialStateFunction) {
-      reactClass[markedKey] = true;
+        reactClass[markedKey] = true;
       }
       return reactClass;
     };
