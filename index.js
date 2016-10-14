@@ -50,7 +50,7 @@ StateSaver.prototype.installCaptureHook = function() {
       }
     };
     React.createClass = function(spec) {
-      var hasGetInitialStateFunction = getInitialStateKey in Object.keys(spec);
+      var hasGetInitialStateFunction = getInitialStateKey in spec;
       if(hasGetInitialStateFunction) {
         spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
         spec[originalGetInitialStateFunctionSaveKey] = spec[getInitialStateKey];
@@ -78,7 +78,7 @@ StateSaver.prototype.installReplayHook = function() {
     originalCreateClassFunction = React.createClass;
     var stateSaver = this;
     React.createClass = function(spec) {
-      var hasGetInitialStateFunction = getInitialStateKey in Object.keys(spec);
+      var hasGetInitialStateFunction = getInitialStateKey in spec;
       if(hasGetInitialStateFunction) {
         var originalGetInitialStateFunction = spec[getInitialStateKey];
         spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
