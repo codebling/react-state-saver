@@ -63,11 +63,19 @@ StateSaver.prototype.installCaptureHook = function() {
       return reactClass;
     };
     originalRequire = Module.prototype.require;
+    var recursivelyReplaceGetInitialStateFunctions = function(module) {
+      if(module.exports[markedKey]) {
+        var spec = module.exports.prototype;
+        spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
+        module.children.forEach(recursivelyReplaceGetInitialStateFunctions)
+      }
+    };
     Module.prototype.require = function() {
       var potentialReactClass = originalRequire.apply(this, arguments);
       if(potentialReactClass[markedKey]) {
-        var spec = potentialReactClass.prototype;
-        spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
+        var resolvedPath = Module._resolveFilename(arguments[0], this, false);
+        var module = Module._cache[resolvedPath];
+        recursivelyReplaceGetInitialStateFunctions(module);
       }
       return potentialReactClass;
     }
