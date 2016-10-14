@@ -67,8 +67,10 @@ StateSaver.prototype.installCaptureHook = function() {
       if(module.exports[markedKey]) {
         var spec = module.exports.prototype;
         spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
-        module.children.forEach(recursivelyReplaceGetInitialStateFunctions)
       }
+      //recurse through children even if this isn't a marked class, or even a class at all,
+      // as stateful classes may be included by stateless functions
+      module.children.forEach(recursivelyReplaceGetInitialStateFunctions)
     };
     Module.prototype.require = function() {
       var potentialReactClass = originalRequire.apply(this, arguments);
