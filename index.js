@@ -74,9 +74,9 @@ StateSaver.prototype.installCaptureHook = function() {
     };
     Module.prototype.require = function() {
       var potentialReactClass = originalRequire.apply(this, arguments);
-      if(potentialReactClass[markedKey]) {
-        var resolvedPath = Module._resolveFilename(arguments[0], this, false);
-        var module = Module._cache[resolvedPath];
+      var resolvedPath = Module._resolveFilename(arguments[0], this, false);
+      var module = Module._cache[resolvedPath];
+      if(typeof module !== 'undefined') { //will be undefined if bundled/system lib
         recursivelyReplaceGetInitialStateFunctions(module);
       }
       return potentialReactClass;
