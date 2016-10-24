@@ -82,13 +82,13 @@ StateSaver.prototype.installCaptureHook = function() {
     Module.prototype.require = function() {
       var potentialReactClass = originalRequire.apply(this, arguments);
       var resolvedPath = Module._resolveFilename(arguments[0], this, false);
-      var module = Module._cache[resolvedPath];
-      if(typeof module !== 'undefined') { //will be undefined if bundled/system lib
+      var requiredModule = Module._cache[resolvedPath];
+      if(typeof requiredModule !== 'undefined') { //will be undefined if bundled/system lib
         if (!(requireesKey in this))
           this[requireesKey] = [];
-        if (this[requireesKey].indexOf(module) == -1)
-          this[requireesKey].push(module);
-        recursivelyReplaceGetInitialStateFunctions(module);
+        if (this[requireesKey].indexOf(requiredModule) == -1)
+          this[requireesKey].push(requiredModule);
+        recursivelyReplaceGetInitialStateFunctions(requiredModule);
       }
       return potentialReactClass;
     }
