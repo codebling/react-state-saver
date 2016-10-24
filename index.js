@@ -10,6 +10,8 @@ var markedKey = '__REACT_STATE_SAVER_MARKED_FOR_REACT_STATE_SAVING__';
 var parsedKey = '__REACT_STATE_SAVER_PARSED__';
 var originalGetInitialStateFunctionSaveKey = '__REACT_STATE_SAVER_ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
 var hashOfPlainOldSpecKey = '__REACT_STATE_SAVER_HASH_OF_PLAIN_OLD_SPEC__';
+var requireesKey = '__REACT_STATE_SAVER_MODULE_SHIM_REQUIREES__';
+var requirersKey = '__REACT_STATE_SAVER_MODULE_SHIM_REQUIREES__';
 
 var HashingHelper = {};
 HashingHelper.functionNormalisingReplacer = function (value) {
@@ -73,7 +75,7 @@ StateSaver.prototype.installCaptureHook = function() {
         module[parsedKey] = true;
         //recurse through children even if this isn't a marked class, or even a class at all,
         // as stateful classes may be included by stateless functions
-        module.children.forEach(recursivelyReplaceGetInitialStateFunctions)
+        module[requireesKey].forEach(recursivelyReplaceGetInitialStateFunctions)
         delete module[parsedKey];
       }
     };
@@ -82,6 +84,10 @@ StateSaver.prototype.installCaptureHook = function() {
       var resolvedPath = Module._resolveFilename(arguments[0], this, false);
       var module = Module._cache[resolvedPath];
       if(typeof module !== 'undefined') { //will be undefined if bundled/system lib
+        if (!(requireesKey in this))
+          this[requireesKey] = [];
+        if (this[requireesKey].indexOf(module) == -1)
+          this[requireesKey].push(module);
         recursivelyReplaceGetInitialStateFunctions(module);
       }
       return potentialReactClass;
