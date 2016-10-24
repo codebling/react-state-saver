@@ -55,7 +55,7 @@ StateSaver.prototype.installCaptureHook = function() {
       if(hasGetInitialStateFunction) {
         spec[hashOfPlainOldSpecKey] = HashingHelper.computeHashOfPlainOldSpec(spec);
         spec[originalGetInitialStateFunctionSaveKey] = spec[getInitialStateKey];
-        spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
+        //don't bother replacing 'getInitialState' here, we need to replace it during on require anyhow
       }
       var reactClass = originalCreateClassFunction.apply(React, arguments);
       if(hasGetInitialStateFunction) {
