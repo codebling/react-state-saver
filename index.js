@@ -11,7 +11,6 @@ var parsedKey = '__REACT_STATE_SAVER_PARSED__';
 var originalGetInitialStateFunctionSaveKey = '__REACT_STATE_SAVER_ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
 var hashOfPlainOldSpecKey = '__REACT_STATE_SAVER_HASH_OF_PLAIN_OLD_SPEC__';
 var requireesKey = '__REACT_STATE_SAVER_MODULE_SHIM_REQUIREES__';
-var requirersKey = '__REACT_STATE_SAVER_MODULE_SHIM_REQUIREES__';
 
 var HashingHelper = {};
 HashingHelper.functionNormalisingReplacer = function (value) {
