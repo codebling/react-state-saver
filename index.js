@@ -7,6 +7,7 @@ var originalCreateClassFunction = null;
 var originalRequire = null;
 var getInitialStateKey = 'getInitialState';
 var markedKey = '__REACT_STATE_SAVER_MARKED_FOR_REACT_STATE_SAVING__';
+var parsedKey = '__REACT_STATE_SAVER_PARSED__';
 var originalGetInitialStateFunctionSaveKey = '__REACT_STATE_SAVER_ORIGINAL_GET_INITIAL_STATE_FUNCTION__';
 var hashOfPlainOldSpecKey = '__REACT_STATE_SAVER_HASH_OF_PLAIN_OLD_SPEC__';
 
@@ -64,13 +65,17 @@ StateSaver.prototype.installCaptureHook = function() {
     };
     originalRequire = Module.prototype.require;
     var recursivelyReplaceGetInitialStateFunctions = function(module) {
+      if(!module[parsedKey]) {
       if(module.exports[markedKey]) {
         var spec = module.exports.prototype;
         spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
       }
+      module[parsedKey] = true;
       //recurse through children even if this isn't a marked class, or even a class at all,
       // as stateful classes may be included by stateless functions
       module.children.forEach(recursivelyReplaceGetInitialStateFunctions)
+      delete module[parsedKey];
+      }
     };
     Module.prototype.require = function() {
       var potentialReactClass = originalRequire.apply(this, arguments);
