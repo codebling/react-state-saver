@@ -66,16 +66,18 @@ StateSaver.prototype.installCaptureHook = function() {
     };
     originalRequire = Module.prototype.require;
     var recursivelyReplaceGetInitialStateFunctions = function(module) {
-      if(!module[parsedKey]) {
+      if(!module[parsedKey]) { //prevent an infinite recursion loop
         if(module.exports[markedKey]) {
           var spec = module.exports.prototype;
           spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
         }
         if(requireesKey in module) {
-          module[parsedKey] = true;
+          module[parsedKey] = true; //prevent an infinite recursion loop
+
           //recurse through children even if this isn't a marked class, or even a class at all,
           // as stateful classes may be included by stateless functions
           module[requireesKey].forEach(recursivelyReplaceGetInitialStateFunctions);
+
           delete module[parsedKey];
         }
       }
@@ -88,7 +90,7 @@ StateSaver.prototype.installCaptureHook = function() {
         if (!(requireesKey in this))
           this[requireesKey] = [];
         if (this[requireesKey].indexOf(requiredModule) == -1)
-          this[requireesKey].push(requiredModule);
+          this[requireesKey].push(requiredModule); //keep track of ALL children, unlike module.children
         recursivelyReplaceGetInitialStateFunctions(requiredModule);
       }
       return potentialReactClass;
