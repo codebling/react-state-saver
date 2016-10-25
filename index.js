@@ -72,11 +72,11 @@ StateSaver.prototype.installCaptureHook = function() {
           var spec = module.exports.prototype;
           spec[getInitialStateKey] = getReplacementGetInitiailStateFunction(spec);
         }
-        if(requireesKey in  module) {
+        if(requireesKey in module) {
           module[parsedKey] = true;
           //recurse through children even if this isn't a marked class, or even a class at all,
           // as stateful classes may be included by stateless functions
-          module[requireesKey].forEach(recursivelyReplaceGetInitialStateFunctions)
+          module[requireesKey].forEach(recursivelyReplaceGetInitialStateFunctions);
           delete module[parsedKey];
         }
       }
